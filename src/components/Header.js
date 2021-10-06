@@ -1,0 +1,1 @@
+//A Component is one of the core building blocks of React. In other words, we can say that every application you will develop in React will be made up of pieces called components. ... Components in React basically return a piece of JSX code that tells what should be rendered on the screen.
