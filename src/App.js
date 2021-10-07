@@ -3,11 +3,12 @@ import Login from './components/Login';
 import { useState, useEffect} from 'react';
 import Memos from './components/Memos'
 import {requestLogin} from "./services/user";
-import {requestMemos, createMemo} from "./services/memos";
+import {requestMemos, createMemo, deleteMemo} from "./services/memos";
+
 function App() {
     const [token, setToken] = useState('');
-    const [memos, setMemos] = useState({});
-
+    const [memos, setMemos] = useState([]);
+    let needsRefresh = false;
     function handleError (error) {
         console.log(error)
     }
@@ -16,11 +17,13 @@ function App() {
         console.log('gimme all the memos')
         requestMemos(token).then(data => data.json(), handleError).then(json => {
             console.log(json)
+            setMemos(json.memo_list)
         }, handleError).catch(handleError)
     }
 
     //whenever new render or value of token changes call handle request memos
     useEffect(() => {if (token) {handleRequestMemos()}}, [token])
+    // useEffect(() => {if (needsRefresh) {handleRequestMemos()}}, [needsRefresh])
 
     function handleLoginRequest(username, password) {
         requestLogin({username, password}).then(data => data.json(), handleError).then(json => {
@@ -38,10 +41,18 @@ function App() {
             setToken('');
     }
 
-    function handleCreateMemo(memo) {
-        createMemo(token, memo).then(data => data.json(), handleError).then(json => {
+    async function handleCreateMemo(memo) {
+        await createMemo(token, memo).then(data => data.json(), handleError).then(json => {
             console.log(json)
+
         }, handleError).catch(handleError)
+        handleRequestMemos();
+    }
+
+    async function handleDeleteMemo(memo) {
+        await deleteMemo(token, memo)
+        setMemos(memos.filter(item => item.id !== memo.id));
+
     }
 
     return (
@@ -51,7 +62,7 @@ function App() {
               //else run login function to render login screen again.
               token ?
                   //pass param with handle login or logout function as the value
-              <Memos handleLogoutRequest={handleLogoutRequest} handleCreateMemo={handleCreateMemo} /> :
+              <Memos handleLogoutRequest={handleLogoutRequest} handleCreateMemo={handleCreateMemo} memos={memos} handleDeleteMemo={handleDeleteMemo}/> :
               <Login handleLoginRequest={handleLoginRequest} />
           }
       </Container>

@@ -22,3 +22,17 @@ export function createMemo(token, memo) {
         body: JSON.stringify(memo)
     })
 }
+
+export function deleteMemo(token, memo) {
+    console.log(memo)
+    return fetch(base_url + 'memo/' + memo.id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            created_timestamp: memo.created_timestamp
+        })
+    })
+}

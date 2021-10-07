@@ -1,7 +1,7 @@
-import {Button, Row, Col, Card, Placeholder, Modal, Form} from 'react-bootstrap'
+import {Button, Row, Col, Card, Placeholder, Modal, Form, Badge} from 'react-bootstrap'
 import {useState} from "react";
 
-function Memos({handleLogoutRequest, handleCreateMemo}) {
+function Memos({handleLogoutRequest, handleCreateMemo, handleDeleteMemo, memos}) {
 
     const [show, setShow] = useState(false);
     const [content, setContent] = useState('');
@@ -14,6 +14,7 @@ function Memos({handleLogoutRequest, handleCreateMemo}) {
         console.log({content, memoTags});
         const tags = memoTags.split(',');
         handleCreateMemo({content, tags});
+        handleClose();
     }
 
     function handleTextChange(event) {
@@ -61,20 +62,28 @@ function Memos({handleLogoutRequest, handleCreateMemo}) {
             </Col>
         </Row>
         <Row>
-            <Card style={{ width: '18rem' }}>
-                <Card.Body>
-                    <Placeholder as={Card.Title} animation="glow">
-                        <Placeholder xs={6} />
-                    </Placeholder>
-                    <Placeholder as={Card.Text} animation="glow">
-                        <Placeholder xs={7} /> <Placeholder xs={4} /> <Placeholder xs={4} />{' '}
-                        <Placeholder xs={6} /> <Placeholder xs={8} />
-                    </Placeholder>
-                </Card.Body>
-                <Card.Footer>
-
-                </Card.Footer>
-            </Card>
+            {
+                memos.map(memo => {
+                    return (
+                        <Card style={{ width: '18rem' }}>
+                            <Card.Header>
+                                <Button variant="danger" onClick={() => handleDeleteMemo(memo)}>Delete</Button>
+                            </Card.Header>
+                            <Card.Body>
+                                <Card.Subtitle>
+                                    {memo.created_timestamp}
+                                </Card.Subtitle>
+                                {memo.content}
+                            </Card.Body>
+                            <Card.Footer>
+                                {memo.tags ? memo.tags.map(tag => {
+                                    return (<Badge>{tag}</Badge>)}) :
+                                    console.log('No tags')}
+                            </Card.Footer>
+                        </Card>
+                    )
+                })
+            }
         </Row>
         </>
     );
